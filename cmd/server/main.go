@@ -14,7 +14,7 @@ var logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 func main() {
 	r := gin.Default()
 	v1 := r.Group("api/v1")
-	v1.POST("/sendmsg", handlers.SendMessage)
+	v1.POST("/sendcode", handlers.SendCode)
 
 	logger.Info("server starting",
 		"port", 4444,

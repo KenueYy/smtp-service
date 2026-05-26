@@ -12,7 +12,7 @@ import (
 
 var cfg = config.Load()
 
-func SendMessage(c *gin.Context) {
+func SendCode(c *gin.Context) {
 	var msg models.Message
 	if err := c.ShouldBindJSON(&msg); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
@@ -37,3 +37,5 @@ func SendAuthCode(toEmail, code string) error {
 
 	return nil
 }
+
+
