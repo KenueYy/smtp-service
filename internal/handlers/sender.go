@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kenueyy/smtp-service/internal/models"
+	"github.com/kenueyy/smtp-service/internal/templates"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kenueyy/smtp-service/internal/config"
@@ -27,7 +28,7 @@ func SendAuthCode(toEmail, code string) error {
 	m.SetHeader("From", cfg.From)
 	m.SetHeader("To", toEmail)
 	m.SetHeader("Subject", "Код подтверждения")
-	m.SetBody("text/plain", fmt.Sprintf("Ваш код: %s", code))
+	m.SetBody("text/html", templates.AuthCodeEmail(code))
 
 	d := gomail.NewDialer("mail.hosting.reg.ru", 465, cfg.From, cfg.Password)
 
