@@ -15,6 +15,7 @@ func main() {
 	r := gin.Default()
 	v1 := r.Group("api/v1")
 	v1.POST("/sendcode", handlers.SendCode)
+	v1.POST("/subscription-notify", handlers.SendSubscriptionNotificationHandler)
 
 	logger.Info("server starting",
 		"port", 4444,
