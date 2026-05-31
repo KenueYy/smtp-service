@@ -16,6 +16,7 @@ func main() {
 	v1 := r.Group("api/v1")
 	v1.POST("/sendcode", handlers.SendCode)
 	v1.POST("/subscription-notify", handlers.SendSubscriptionNotificationHandler)
+	v1.POST("/support-ticket", handlers.SendSupportTicketHandler)
 
 	logger.Info("server starting",
 		"port", 4444,

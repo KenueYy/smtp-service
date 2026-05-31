@@ -59,6 +59,45 @@ func SendSubscriptionNotificationHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "ok"})
 }
 
+func SendSupportTicketHandler(c *gin.Context) {
+	var msg models.SupportTicketMsg
+	if err := c.ShouldBindJSON(&msg); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := SendSupportTicketEmail(msg.Description, msg.ContactMethod, msg.Contact, msg.ToEmail); err != nil {
+		logger.Error("send support ticket email failed",
+			"contact_method", msg.ContactMethod,
+			"error", err,
+		)
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	logger.Info("support ticket email sent",
+		"contact_method", msg.ContactMethod,
+		"to_email", msg.ToEmail,
+	)
+	c.JSON(200, gin.H{"message": "ok"})
+}
+
+func SendSupportTicketEmail(description, contactMethod, contact, toEmail string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", cfg.From)
+	m.SetHeader("To", toEmail)
+	m.SetHeader("Subject", "Обращение в поддержку — "+contactMethod)
+	m.SetBody("text/html", templates.SupportTicketEmail(description, contactMethod, contact))
+
+	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.From, cfg.Password)
+
+	if err := d.DialAndSend(m); err != nil {
+		return fmt.Errorf("send support ticket error: %w", err)
+	}
+
+	return nil
+}
+
 func SendAuthCode(toEmail, code string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", cfg.From)

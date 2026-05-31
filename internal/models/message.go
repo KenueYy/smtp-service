@@ -13,3 +13,10 @@ type SubscriptionNotificationMsg struct {
 	ExpireDate time.Time `json:"expire_date" binding:"required"`
 	RenewalURL string   `json:"renewal_url" binding:"required"`
 }
+
+type SupportTicketMsg struct {
+	Description   string `json:"description" binding:"required"`
+	ContactMethod string `json:"contact_method" binding:"required"`
+	Contact       string `json:"contact" binding:"required"`
+	ToEmail       string `json:"to_email" binding:"required,email"`
+}
