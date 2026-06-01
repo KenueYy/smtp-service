@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
-func SubscriptionExpiringSoon(expireDate time.Time, renewalURL string) string {
+func SubscriptionExpiringSoon(expireDate time.Time, renewalURL string, daysLeft int) string {
 	dateStr := expireDate.Format("02.01.2006")
+	heading := subscriptionHeading(daysLeft)
+
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -62,7 +64,7 @@ ne<span style="color:#486581;">VPN</span>
 <tr>
 <td align="center" style="padding:0 32px 8px;">
 <h1 style="margin:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:22px;font-weight:700;color:#0a1929;line-height:1.3;">
-Подписка заканчивается через 3 дня
+%s
 </h1>
 </td>
 </tr>
@@ -123,7 +125,20 @@ neVPN — ускоритель интернета, который просто �
 </tr>
 </table>
 </body>
-</html>`, dateStr, renewalURL)
+</html>`, heading, dateStr, renewalURL)
+}
+
+func subscriptionHeading(daysLeft int) string {
+	switch {
+	case daysLeft >= 3:
+		return "Подписка заканчивается через 3 дня"
+	case daysLeft == 2:
+		return "Подписка заканчивается через 2 дня"
+	case daysLeft == 1:
+		return "Подписка заканчивается завтра"
+	default:
+		return "Подписка заканчивается сегодня"
+	}
 }
 
 func SubscriptionExpired(expireDate time.Time, renewalURL string) string {

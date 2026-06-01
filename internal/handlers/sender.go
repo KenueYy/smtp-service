@@ -42,7 +42,7 @@ func SendSubscriptionNotificationHandler(c *gin.Context) {
 		return
 	}
 
-	if err := SendSubscriptionEmail(msg.Email, msg.Type, msg.ExpireDate, msg.RenewalURL); err != nil {
+	if err := SendSubscriptionEmail(msg.Email, msg.Type, msg.ExpireDate, msg.RenewalURL, msg.DaysLeft); err != nil {
 		logger.Error("send subscription notification failed",
 			"email", msg.Email,
 			"type", msg.Type,
@@ -114,7 +114,7 @@ func SendAuthCode(toEmail, code string) error {
 	return nil
 }
 
-func SendSubscriptionEmail(toEmail, notifType string, expireDate interface{}, renewalURL string) error {
+func SendSubscriptionEmail(toEmail, notifType string, expireDate interface{}, renewalURL string, daysLeft int) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", cfg.From)
 	m.SetHeader("To", toEmail)
@@ -123,12 +123,11 @@ func SendSubscriptionEmail(toEmail, notifType string, expireDate interface{}, re
 
 	switch notifType {
 	case "expiring_soon":
-		subject = "Подписка заканчивается через 3 дня"
 		ed, ok := expireDate.(time.Time)
 		if !ok {
 			return fmt.Errorf("invalid expireDate type for expiring_soon")
 		}
-		body = templates.SubscriptionExpiringSoon(ed, renewalURL)
+		subject, body = subscriptionExpiringSoonContent(ed, renewalURL, daysLeft)
 	case "expired":
 		subject = "Подписка уже закончилась"
 		ed, ok := expireDate.(time.Time)
@@ -152,4 +151,20 @@ func SendSubscriptionEmail(toEmail, notifType string, expireDate interface{}, re
 	return nil
 }
 
-
+func subscriptionExpiringSoonContent(expireDate time.Time, renewalURL string, daysLeft int) (subject, body string) {
+	switch {
+	case daysLeft >= 3:
+		subject = "Подписка заканчивается через 3 дня"
+		body = templates.SubscriptionExpiringSoon(expireDate, renewalURL, 3)
+	case daysLeft == 2:
+		subject = "Подписка заканчивается через 2 дня"
+		body = templates.SubscriptionExpiringSoon(expireDate, renewalURL, 2)
+	case daysLeft == 1:
+		subject = "Подписка заканчивается завтра"
+		body = templates.SubscriptionExpiringSoon(expireDate, renewalURL, 1)
+	default:
+		subject = "Подписка заканчивается сегодня"
+		body = templates.SubscriptionExpiringSoon(expireDate, renewalURL, 0)
+	}
+	return
+}

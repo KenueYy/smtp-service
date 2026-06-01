@@ -35,7 +35,7 @@ func main() {
 
 	fmt.Printf("To: %s\nType: %s\nExpireDate: %s\n\n", email, notifType, expireDate.Format("02.01.2006 15:04"))
 
-	if err := handlers.SendSubscriptionEmail(email, notifType, expireDate, renewalURL); err != nil {
+	if err := handlers.SendSubscriptionEmail(email, notifType, expireDate, renewalURL, 3); err != nil {
 		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}

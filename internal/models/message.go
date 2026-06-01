@@ -11,7 +11,8 @@ type SubscriptionNotificationMsg struct {
 	Email      string    `json:"email" binding:"required,email"`
 	Type       string    `json:"type" binding:"required"` // "expiring_soon" or "expired"
 	ExpireDate time.Time `json:"expire_date" binding:"required"`
-	RenewalURL string   `json:"renewal_url" binding:"required"`
+	RenewalURL string    `json:"renewal_url" binding:"required"`
+	DaysLeft   int       `json:"days_left"`
 }
 
 type SupportTicketMsg struct {
